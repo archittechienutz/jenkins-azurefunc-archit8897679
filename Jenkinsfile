@@ -12,7 +12,7 @@ pipeline {
             steps {
                 dir('MyFuncApp') {
                     echo 'Installing dependencies...'
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 dir('MyFuncApp') {
                     echo 'Running tests...'
-                    sh 'npm test'
+                    bat 'npm test'
                 }
             }
         }
@@ -30,13 +30,10 @@ pipeline {
             steps {
                 dir('MyFuncApp') {
                     echo 'Deploying to Azure...'
-                    sh """
-                        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-                        zip -r function.zip .
-                        az functionapp deployment source config-zip \
-                          --resource-group $RESOURCE_GROUP \
-                          --name $FUNCTION_APP_NAME \
-                          --src function.zip
+                    bat """
+                        az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%
+                        powershell Compress-Archive -Path * -DestinationPath function.zip
+                        az functionapp deployment source config-zip --resource-group %RESOURCE_GROUP% --name %FUNCTION_APP_NAME% --src function.zip
                     """
                 }
             }
